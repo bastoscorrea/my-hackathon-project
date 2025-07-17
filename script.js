@@ -578,3 +578,547 @@ canvas.addEventListener("touchend", function (e) {
 
 // Initialize the game when page loads
 document.addEventListener("DOMContentLoaded", initGame);
+
+// ENHANCED FEATURES
+// =================
+
+// Sound Manager Class
+class SoundManager {
+  constructor() {
+    this.sounds = {};
+    this.sfxEnabled = true;
+    this.sfxVolume = 0.7;
+    this.initSounds();
+  }
+
+  initSounds() {
+    try {
+      this.audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
+      this.createBeepSound("eat", 800, 0.1);
+      this.createBeepSound("powerup", 1200, 0.2);
+      this.createBeepSound("gameOver", 200, 0.5);
+      this.createBeepSound("levelUp", 1000, 0.3);
+    } catch (e) {
+      console.log("Web Audio not supported");
+    }
+  }
+
+  createBeepSound(name, frequency, duration) {
+    this.sounds[name] = { frequency, duration };
+  }
+
+  play(soundName) {
+    if (!this.sfxEnabled || !this.sounds[soundName] || !this.audioContext)
+      return;
+
+    try {
+      const sound = this.sounds[soundName];
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+
+      oscillator.frequency.value = sound.frequency;
+      oscillator.type = "square";
+
+      gainNode.gain.setValueAtTime(
+        this.sfxVolume * 0.1,
+        this.audioContext.currentTime
+      );
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        this.audioContext.currentTime + sound.duration
+      );
+
+      oscillator.start(this.audioContext.currentTime);
+      oscillator.stop(this.audioContext.currentTime + sound.duration);
+    } catch (e) {
+      console.log("Sound playback failed");
+    }
+  }
+
+  setVolume(volume) {
+    this.sfxVolume = volume / 100;
+  }
+}
+
+// Achievement Manager
+class AchievementManager {
+  constructor() {
+    this.achievements = {
+      "first-steps": { unlocked: false, condition: () => game.score >= 10 },
+      "snake-master": { unlocked: false, condition: () => game.score >= 500 },
+      "speed-demon": {
+        unlocked: false,
+        condition: () =>
+          document.getElementById("difficulty-select").value === "insane" &&
+          game.score >= 100,
+      },
+      survivor: {
+        unlocked: false,
+        condition: () => game.survivalTime >= 120000,
+      },
+    };
+    this.loadAchievements();
+  }
+
+  loadAchievements() {
+    const saved = localStorage.getItem("snakeAchievements");
+    if (saved) {
+      const savedAchievements = JSON.parse(saved);
+      Object.keys(savedAchievements).forEach((key) => {
+        if (this.achievements[key]) {
+          this.achievements[key].unlocked = savedAchievements[key].unlocked;
+        }
+      });
+    }
+    this.updateUI();
+  }
+
+  checkAchievements() {
+    Object.keys(this.achievements).forEach((key) => {
+      const achievement = this.achievements[key];
+      if (!achievement.unlocked && achievement.condition()) {
+        this.unlockAchievement(key);
+      }
+    });
+  }
+
+  unlockAchievement(key) {
+    if (this.achievements[key] && !this.achievements[key].unlocked) {
+      this.achievements[key].unlocked = true;
+      this.saveAchievements();
+      this.updateUI();
+      soundManager?.play("levelUp");
+    }
+  }
+
+  updateUI() {
+    Object.keys(this.achievements).forEach((key) => {
+      const element = document.getElementById(`achievement-${key}`);
+      if (element) {
+        element.className = this.achievements[key].unlocked
+          ? "achievement-item unlocked"
+          : "achievement-item locked";
+      }
+    });
+  }
+
+  saveAchievements() {
+    localStorage.setItem(
+      "snakeAchievements",
+      JSON.stringify(this.achievements)
+    );
+  }
+}
+
+// Statistics Manager
+class StatsManager {
+  constructor() {
+    this.stats = {
+      gamesPlayed: 0,
+      totalFoodEaten: 0,
+      totalTimePlayed: 0,
+      totalScore: 0,
+    };
+    this.loadStats();
+  }
+
+  loadStats() {
+    const saved = localStorage.getItem("snakeStats");
+    if (saved) {
+      this.stats = { ...this.stats, ...JSON.parse(saved) };
+    }
+    this.updateUI();
+  }
+
+  updateStats(type, value = 1) {
+    this.stats[type] += value;
+    this.saveStats();
+    this.updateUI();
+  }
+
+  saveStats() {
+    localStorage.setItem("snakeStats", JSON.stringify(this.stats));
+  }
+
+  updateUI() {
+    const statElements = {
+      "stat-games": this.stats.gamesPlayed,
+      "stat-food": this.stats.totalFoodEaten,
+      "stat-time": this.formatTime(this.stats.totalTimePlayed),
+      "stat-average":
+        this.stats.gamesPlayed > 0
+          ? Math.round(this.stats.totalScore / this.stats.gamesPlayed)
+          : 0,
+    };
+
+    Object.keys(statElements).forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = statElements[id];
+      }
+    });
+  }
+
+  formatTime(milliseconds) {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}`;
+  }
+}
+
+// Leaderboard Manager
+class LeaderboardManager {
+  constructor() {
+    this.scores = JSON.parse(localStorage.getItem("snakeLeaderboard")) || [];
+    this.updateUI();
+  }
+
+  addScore(playerName, score, gameMode) {
+    this.scores.push({
+      name: playerName || "Anonymous",
+      score,
+      gameMode: gameMode || "classic",
+      date: new Date().toLocaleDateString(),
+    });
+    this.scores.sort((a, b) => b.score - a.score);
+    this.scores = this.scores.slice(0, 10);
+    this.saveScores();
+    this.updateUI();
+  }
+
+  saveScores() {
+    localStorage.setItem("snakeLeaderboard", JSON.stringify(this.scores));
+  }
+
+  updateUI() {
+    const leaderboardList = document.getElementById("leaderboard-list");
+    if (!leaderboardList) return;
+
+    leaderboardList.innerHTML = "";
+
+    if (this.scores.length === 0) {
+      leaderboardList.innerHTML = "<p>No scores yet. Be the first!</p>";
+      return;
+    }
+
+    this.scores.forEach((entry, index) => {
+      const entryElement = document.createElement("div");
+      entryElement.className = "leaderboard-entry";
+      entryElement.innerHTML = `
+                <span class="leaderboard-rank">#${index + 1}</span>
+                <span class="leaderboard-name">${entry.name}</span>
+                <span class="leaderboard-score">${entry.score}</span>
+            `;
+      leaderboardList.appendChild(entryElement);
+    });
+  }
+}
+
+// Initialize enhanced features
+let soundManager, achievementManager, statsManager, leaderboardManager;
+
+document.addEventListener("DOMContentLoaded", function () {
+  soundManager = new SoundManager();
+  achievementManager = new AchievementManager();
+  statsManager = new StatsManager();
+  leaderboardManager = new LeaderboardManager();
+
+  // Enhanced event listeners
+  setupEnhancedEventListeners();
+});
+
+function setupEnhancedEventListeners() {
+  // Settings modal
+  const settingsBtn = document.getElementById("settings-btn");
+  const settingsModal = document.getElementById("settings-modal");
+  const closeSettings = document.getElementById("close-settings");
+  const saveSettingsBtn = document.getElementById("save-settings");
+
+  if (settingsBtn) {
+    settingsBtn.addEventListener("click", () => {
+      settingsModal?.classList.remove("hidden");
+      loadSettings();
+    });
+  }
+
+  if (closeSettings) {
+    closeSettings.addEventListener("click", () => {
+      settingsModal?.classList.add("hidden");
+    });
+  }
+
+  if (saveSettingsBtn) {
+    saveSettingsBtn.addEventListener("click", saveSettings);
+  }
+
+  // Volume controls
+  const musicVolume = document.getElementById("music-volume");
+  const sfxVolume = document.getElementById("sfx-volume");
+
+  if (musicVolume) {
+    musicVolume.addEventListener("input", updateMusicVolume);
+  }
+
+  if (sfxVolume) {
+    sfxVolume.addEventListener("input", updateSfxVolume);
+  }
+
+  // Game mode selector
+  const modeSelect = document.getElementById("mode-select");
+  if (modeSelect) {
+    modeSelect.addEventListener("change", changeGameMode);
+  }
+}
+
+function loadSettings() {
+  const settings = JSON.parse(localStorage.getItem("snakeSettings")) || {};
+
+  const elements = {
+    "music-volume": settings.musicVolume || 50,
+    "sfx-volume": settings.sfxVolume || 70,
+    "custom-speed": settings.customSpeed || "medium",
+    "player-name": settings.playerName || "",
+  };
+
+  Object.keys(elements).forEach((id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      if (element.type === "checkbox") {
+        element.checked = settings[id.replace("-", "")] !== false;
+      } else {
+        element.value = elements[id];
+      }
+    }
+  });
+
+  updateVolumeDisplays();
+}
+
+function saveSettings() {
+  const settings = {
+    musicVolume: document.getElementById("music-volume")?.value || 50,
+    sfxVolume: document.getElementById("sfx-volume")?.value || 70,
+    customSpeed: document.getElementById("custom-speed")?.value || "medium",
+    particleEffects:
+      document.getElementById("particle-effects")?.checked !== false,
+    screenShake: document.getElementById("screen-shake")?.checked !== false,
+    playerName: document.getElementById("player-name")?.value || "",
+  };
+
+  localStorage.setItem("snakeSettings", JSON.stringify(settings));
+  soundManager?.setVolume(settings.sfxVolume);
+
+  document.getElementById("settings-modal")?.classList.add("hidden");
+}
+
+function updateMusicVolume() {
+  const volume = document.getElementById("music-volume")?.value || 50;
+  const display = document.getElementById("music-value");
+  if (display) display.textContent = volume + "%";
+}
+
+function updateSfxVolume() {
+  const volume = document.getElementById("sfx-volume")?.value || 70;
+  const display = document.getElementById("sfx-value");
+  if (display) display.textContent = volume + "%";
+  soundManager?.setVolume(volume);
+}
+
+function updateVolumeDisplays() {
+  updateMusicVolume();
+  updateSfxVolume();
+}
+
+function changeGameMode() {
+  const gameMode = document.getElementById("mode-select")?.value || "classic";
+  game.gameMode = gameMode;
+
+  // Reset game when changing modes if currently playing
+  if (game.gameRunning) {
+    restartGame();
+  }
+}
+
+// Enhanced theme system
+const enhancedThemes = {
+  ...themes,
+  gameboy: {
+    snake: "#0F380F",
+    food: "#0F380F",
+    background: "#9BBC0F",
+    grid: "#8BAC0F",
+  },
+  neon: {
+    snake: "#ff00ff",
+    food: "#00ffff",
+    background: "#000000",
+    grid: "#330033",
+  },
+  matrix: {
+    snake: "#00ff41",
+    food: "#00ff41",
+    background: "#000000",
+    grid: "#001100",
+  },
+};
+
+// Override the original theme changing function
+const originalChangeTheme = changeTheme;
+changeTheme = function () {
+  const selectedTheme = document.getElementById("theme-select").value;
+  currentTheme = enhancedThemes[selectedTheme] || themes[selectedTheme];
+
+  document.body.className =
+    selectedTheme === "modern" ? "" : selectedTheme + "-theme";
+  draw();
+};
+
+// Enhanced game functions with sound effects
+const originalGameOver = gameOver;
+gameOver = function () {
+  game.gameRunning = false;
+  game.gamePaused = false;
+
+  // Play sound effect
+  soundManager?.play("gameOver");
+
+  // Update stats
+  if (game.gameStartTime) {
+    const timePlayed = Date.now() - game.gameStartTime;
+    statsManager?.updateStats("totalTimePlayed", timePlayed);
+  }
+
+  // Add to leaderboard
+  const settings = JSON.parse(localStorage.getItem("snakeSettings")) || {};
+  leaderboardManager?.addScore(settings.playerName, game.score, game.gameMode);
+
+  // Check for high score
+  if (game.score > game.highScore) {
+    game.highScore = game.score;
+    localStorage.setItem("snakeHighScore", game.highScore);
+    highScoreElement.textContent = game.highScore;
+    newHighScoreElement.classList.remove("hidden");
+  } else {
+    newHighScoreElement.classList.add("hidden");
+  }
+
+  finalScoreElement.textContent = game.score;
+  document.getElementById("game-over-screen").classList.remove("hidden");
+  updateButtons();
+};
+
+// Enhanced start game function
+const originalStartGame = startGame;
+startGame = function () {
+  if (game.gameRunning) return;
+
+  game.gameRunning = true;
+  game.gamePaused = false;
+  game.gameStartTime = Date.now();
+  game.gameMode = document.getElementById("mode-select")?.value || "classic";
+
+  hideAllScreens();
+  updateButtons();
+
+  // Update stats
+  statsManager?.updateStats("gamesPlayed");
+
+  if (game.direction.x === 0 && game.direction.y === 0) {
+    game.direction = { x: game.gridSize, y: 0 };
+  }
+
+  requestAnimationFrame(gameLoop);
+};
+
+// Enhanced update function with achievements
+const originalUpdate = update;
+update = function () {
+  originalUpdate();
+
+  // Check achievements
+  achievementManager?.checkAchievements();
+};
+
+// Add survival time tracking
+game.gameStartTime = 0;
+game.gameMode = "classic";
+game.survivalTime = 0;
+
+// Enhanced gameLoop to track survival time
+const originalGameLoop = gameLoop;
+gameLoop = function (currentTime) {
+  if (!game.gameRunning || game.gamePaused) return;
+
+  // Update survival time
+  if (game.gameStartTime) {
+    game.survivalTime = Date.now() - game.gameStartTime;
+  }
+
+  if (currentTime - game.lastTime >= game.gameSpeed) {
+    update();
+    draw();
+    game.lastTime = currentTime;
+  }
+
+  requestAnimationFrame(gameLoop);
+};
+
+// Sound effects for existing functions
+const originalAnimateScore = animateScore;
+animateScore = function () {
+  originalAnimateScore();
+  soundManager?.play("eat");
+  statsManager?.updateStats("totalFoodEaten");
+  statsManager?.updateStats("totalScore", 10);
+};
+
+// Konami Code Easter Egg
+let konamiCode = [];
+const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // ↑↑↓↓←→←→BA
+
+document.addEventListener("keydown", function (e) {
+  konamiCode.push(e.keyCode);
+  if (konamiCode.length > konami.length) {
+    konamiCode.shift();
+  }
+  if (
+    konamiCode.length === konami.length &&
+    konamiCode.every((key, i) => key === konami[i])
+  ) {
+    activateEasterEgg();
+    konamiCode = [];
+  }
+});
+
+function activateEasterEgg() {
+  // Rainbow mode
+  document.body.style.animation = "rainbow 2s infinite";
+  setTimeout(() => {
+    document.body.style.animation = "";
+  }, 5000);
+
+  // Add temporary rainbow animation
+  const style = document.createElement("style");
+  style.textContent = `
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+    `;
+  document.head.appendChild(style);
+  setTimeout(() => {
+    if (document.head.contains(style)) {
+      document.head.removeChild(style);
+    }
+  }, 5000);
+
+  soundManager?.play("levelUp");
+}
+
+console.log("🐍 Enhanced Snake Game Loaded! Try the Konami code: ↑↑↓↓←→←→BA");

@@ -77,32 +77,32 @@
         <div class="powerup-info">
           <h4>🎯 Active Power-ups</h4>
           <div class="powerup-list">
-            <div class="powerup-item" id="speed-boost" style="display: none;">
+            <div class="powerup-item" id="speed-boost" style="display: none">
               <span class="powerup-icon">⚡</span>
               <span class="powerup-name">Speed Boost</span>
               <span class="powerup-timer">5s</span>
             </div>
-            <div class="powerup-item" id="shield" style="display: none;">
+            <div class="powerup-item" id="shield" style="display: none">
               <span class="powerup-icon">🛡️</span>
               <span class="powerup-name">Shield</span>
               <span class="powerup-timer">10s</span>
             </div>
-            <div class="powerup-item" id="double-points" style="display: none;">
+            <div class="powerup-item" id="double-points" style="display: none">
               <span class="powerup-icon">💰</span>
               <span class="powerup-name">Double Points</span>
               <span class="powerup-timer">15s</span>
             </div>
           </div>
         </div>
-        
+
         <canvas id="game-canvas" width="400" height="400"></canvas>
-        
+
         <div class="game-info">
-          <div class="survival-timer" id="survival-timer" style="display: none;">
+          <div class="survival-timer" id="survival-timer" style="display: none">
             <span class="timer-label">Survival Time:</span>
             <span id="survival-time">00:00</span>
           </div>
-          <div class="combo-display" id="combo-display" style="display: none;">
+          <div class="combo-display" id="combo-display" style="display: none">
             <span class="combo-label">Combo:</span>
             <span id="combo-count">0x</span>
           </div>
@@ -223,12 +223,18 @@
         <div class="modal-body">
           <div class="setting-item">
             <label for="music-volume">🎵 Music Volume</label>
-            <input type="range" id="music-volume" min="0" max="100" value="50">
+            <input
+              type="range"
+              id="music-volume"
+              min="0"
+              max="100"
+              value="50"
+            />
             <span id="music-value">50%</span>
           </div>
           <div class="setting-item">
             <label for="sfx-volume">🔊 SFX Volume</label>
-            <input type="range" id="sfx-volume" min="0" max="100" value="70">
+            <input type="range" id="sfx-volume" min="0" max="100" value="70" />
             <span id="sfx-value">70%</span>
           </div>
           <div class="setting-item">
@@ -241,20 +247,27 @@
           </div>
           <div class="setting-item">
             <label for="particle-effects">✨ Particle Effects</label>
-            <input type="checkbox" id="particle-effects" checked>
+            <input type="checkbox" id="particle-effects" checked />
           </div>
           <div class="setting-item">
             <label for="screen-shake">📳 Screen Shake</label>
-            <input type="checkbox" id="screen-shake" checked>
+            <input type="checkbox" id="screen-shake" checked />
           </div>
           <div class="setting-item">
             <label for="player-name">👤 Player Name</label>
-            <input type="text" id="player-name" placeholder="Enter your name" maxlength="20">
+            <input
+              type="text"
+              id="player-name"
+              placeholder="Enter your name"
+              maxlength="20"
+            />
           </div>
         </div>
         <div class="modal-footer">
           <button class="game-btn" id="save-settings">Save Settings</button>
-          <button class="game-btn secondary" id="reset-settings">Reset to Default</button>
+          <button class="game-btn secondary" id="reset-settings">
+            Reset to Default
+          </button>
         </div>
       </div>
     </div>
