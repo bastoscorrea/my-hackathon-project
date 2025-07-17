@@ -39,6 +39,9 @@
             <option value="modern">Modern</option>
             <option value="nokia">Old Phone (Nokia)</option>
             <option value="crt">CRT Monitor</option>
+            <option value="gameboy">Game Boy</option>
+            <option value="neon">Neon Cyberpunk</option>
+            <option value="matrix">Matrix</option>
           </select>
         </div>
 
@@ -52,15 +55,58 @@
           </select>
         </div>
 
+        <div class="game-mode-selector">
+          <label for="mode-select">Game Mode:</label>
+          <select id="mode-select">
+            <option value="classic">Classic</option>
+            <option value="survival">Survival</option>
+            <option value="zen">Zen Mode</option>
+            <option value="powerup">Power-up Mode</option>
+          </select>
+        </div>
+
         <div class="game-buttons">
           <button id="start-btn" class="game-btn">Start Game</button>
           <button id="pause-btn" class="game-btn" disabled>Pause</button>
           <button id="restart-btn" class="game-btn">Restart</button>
+          <button id="settings-btn" class="game-btn">⚙️ Settings</button>
         </div>
       </div>
 
       <div class="game-area">
+        <div class="powerup-info">
+          <h4>🎯 Active Power-ups</h4>
+          <div class="powerup-list">
+            <div class="powerup-item" id="speed-boost" style="display: none;">
+              <span class="powerup-icon">⚡</span>
+              <span class="powerup-name">Speed Boost</span>
+              <span class="powerup-timer">5s</span>
+            </div>
+            <div class="powerup-item" id="shield" style="display: none;">
+              <span class="powerup-icon">🛡️</span>
+              <span class="powerup-name">Shield</span>
+              <span class="powerup-timer">10s</span>
+            </div>
+            <div class="powerup-item" id="double-points" style="display: none;">
+              <span class="powerup-icon">💰</span>
+              <span class="powerup-name">Double Points</span>
+              <span class="powerup-timer">15s</span>
+            </div>
+          </div>
+        </div>
+        
         <canvas id="game-canvas" width="400" height="400"></canvas>
+        
+        <div class="game-info">
+          <div class="survival-timer" id="survival-timer" style="display: none;">
+            <span class="timer-label">Survival Time:</span>
+            <span id="survival-time">00:00</span>
+          </div>
+          <div class="combo-display" id="combo-display" style="display: none;">
+            <span class="combo-label">Combo:</span>
+            <span id="combo-count">0x</span>
+          </div>
+        </div>
         <div id="game-over-screen" class="game-over hidden">
           <h2>Game Over!</h2>
           <p>Final Score: <span id="final-score">0</span></p>
@@ -96,9 +142,121 @@
         </div>
       </div>
 
+      <!-- Achievements Panel -->
+      <div class="achievements-panel">
+        <h3>🏆 Achievements</h3>
+        <div class="achievements-grid">
+          <div class="achievement-item unlocked" id="achievement-first-steps">
+            <span class="achievement-icon">🥇</span>
+            <div class="achievement-text">
+              <span class="achievement-name">First Steps</span>
+              <span class="achievement-desc">Score 10 points</span>
+            </div>
+          </div>
+          <div class="achievement-item locked" id="achievement-snake-master">
+            <span class="achievement-icon">🐍</span>
+            <div class="achievement-text">
+              <span class="achievement-name">Snake Master</span>
+              <span class="achievement-desc">Reach 500 points</span>
+            </div>
+          </div>
+          <div class="achievement-item locked" id="achievement-speed-demon">
+            <span class="achievement-icon">⚡</span>
+            <div class="achievement-text">
+              <span class="achievement-name">Speed Demon</span>
+              <span class="achievement-desc">Complete insane difficulty</span>
+            </div>
+          </div>
+          <div class="achievement-item locked" id="achievement-survivor">
+            <span class="achievement-icon">⏰</span>
+            <div class="achievement-text">
+              <span class="achievement-name">Survivor</span>
+              <span class="achievement-desc">Survive 2 minutes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Section -->
+      <div class="progress-section">
+        <h3>📈 Your Progress</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-number" id="stat-games">0</span>
+            <span class="stat-label">Games Played</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="stat-food">0</span>
+            <span class="stat-label">Food Eaten</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="stat-time">00:00</span>
+            <span class="stat-label">Time Played</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number" id="stat-average">0</span>
+            <span class="stat-label">Average Score</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="leaderboard-section">
+        <h3>🏅 Leaderboard</h3>
+        <div class="leaderboard-list" id="leaderboard-list">
+          <!-- Leaderboard entries will be populated by JavaScript -->
+        </div>
+      </div>
+
       <footer class="game-footer">
         <p>Made with ❤️ for the hackathon | Use VS Code + GitHub Copilot</p>
       </footer>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ Settings</h2>
+          <button class="close-btn" id="close-settings">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="setting-item">
+            <label for="music-volume">🎵 Music Volume</label>
+            <input type="range" id="music-volume" min="0" max="100" value="50">
+            <span id="music-value">50%</span>
+          </div>
+          <div class="setting-item">
+            <label for="sfx-volume">🔊 SFX Volume</label>
+            <input type="range" id="sfx-volume" min="0" max="100" value="70">
+            <span id="sfx-value">70%</span>
+          </div>
+          <div class="setting-item">
+            <label for="custom-speed">🐍 Snake Speed</label>
+            <select id="custom-speed">
+              <option value="slow">Tortoise 🐢</option>
+              <option value="medium" selected>Snake 🐍</option>
+              <option value="fast">Cheetah 🐆</option>
+            </select>
+          </div>
+          <div class="setting-item">
+            <label for="particle-effects">✨ Particle Effects</label>
+            <input type="checkbox" id="particle-effects" checked>
+          </div>
+          <div class="setting-item">
+            <label for="screen-shake">📳 Screen Shake</label>
+            <input type="checkbox" id="screen-shake" checked>
+          </div>
+          <div class="setting-item">
+            <label for="player-name">👤 Player Name</label>
+            <input type="text" id="player-name" placeholder="Enter your name" maxlength="20">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="game-btn" id="save-settings">Save Settings</button>
+          <button class="game-btn secondary" id="reset-settings">Reset to Default</button>
+        </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
