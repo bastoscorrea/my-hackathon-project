@@ -1,0 +1,380 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.game-container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+}
+
+/* Header Styles */
+.game-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.game-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2rem;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-stats {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(52, 73, 94, 0.1);
+    padding: 0.8rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.game-stats .label {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.score-container, .high-score-container, .level-container {
+    font-size: 1rem;
+    color: #2c3e50;
+}
+
+/* Controls */
+.game-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.theme-selector, .difficulty-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.theme-selector label, .difficulty-selector label {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+select {
+    padding: 0.5rem;
+    border: 2px solid #3498db;
+    border-radius: 5px;
+    background: white;
+    font-family: inherit;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+select:hover, select:focus {
+    border-color: #2980b9;
+    outline: none;
+}
+
+.game-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.game-btn {
+    padding: 0.7rem 1.2rem;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: white;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.game-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+
+.game-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Game Area */
+.game-area {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+#game-canvas {
+    border: 3px solid #2c3e50;
+    border-radius: 10px;
+    background: #ecf0f1;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Game Over and Pause Screens */
+.game-over, .pause-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.game-over h2, .pause-screen h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #e74c3c;
+}
+
+.pause-screen h2 {
+    color: #f39c12;
+}
+
+.game-over p, .pause-screen p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+#new-high-score {
+    color: #f1c40f;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Instructions */
+.instructions {
+    background: rgba(52, 73, 94, 0.1);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.instructions h3 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.8rem;
+}
+
+.control-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 5px;
+}
+
+.key {
+    background: #34495e;
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+/* Footer */
+.game-footer {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.9rem;
+}
+
+/* Theme Styles */
+
+/* Nokia/Old Phone Theme */
+body.nokia-theme {
+    background: #2c3e50;
+    color: #2ecc71;
+}
+
+body.nokia-theme .game-container {
+    background: #34495e;
+    border: 3px solid #2ecc71;
+    border-radius: 0;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+}
+
+body.nokia-theme .game-title {
+    color: #2ecc71;
+    font-family: 'Press Start 2P', cursive;
+}
+
+body.nokia-theme #game-canvas {
+    background: #2c3e50;
+    border: 2px solid #2ecc71;
+    border-radius: 0;
+}
+
+body.nokia-theme .game-stats {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid #2ecc71;
+}
+
+body.nokia-theme .game-btn {
+    background: #2ecc71;
+    color: #2c3e50;
+    border: 2px solid #27ae60;
+    border-radius: 0;
+}
+
+body.nokia-theme select {
+    background: #2c3e50;
+    color: #2ecc71;
+    border: 2px solid #2ecc71;
+}
+
+/* CRT Monitor Theme */
+body.crt-theme {
+    background: #000;
+    color: #00ff00;
+    font-family: 'Courier New', monospace;
+}
+
+body.crt-theme .game-container {
+    background: #111;
+    border: 2px solid #00ff00;
+    border-radius: 0;
+    box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.5),
+        inset 0 0 20px rgba(0, 255, 0, 0.1);
+    animation: crt-flicker 0.15s infinite linear alternate;
+}
+
+body.crt-theme .game-title {
+    color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+    animation: crt-glow 2s ease-in-out infinite alternate;
+}
+
+body.crt-theme #game-canvas {
+    background: #000;
+    border: 1px solid #00ff00;
+    border-radius: 0;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+}
+
+body.crt-theme .game-stats {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid #00ff00;
+}
+
+body.crt-theme .game-btn {
+    background: transparent;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    border-radius: 0;
+}
+
+body.crt-theme .game-btn:hover:not(:disabled) {
+    background: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+body.crt-theme select {
+    background: #000;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes crt-flicker {
+    0% { opacity: 1; }
+    98% { opacity: 1; }
+    99% { opacity: 0.98; }
+    100% { opacity: 1; }
+}
+
+@keyframes crt-glow {
+    from { text-shadow: 0 0 10px #00ff00; }
+    to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .game-container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    .game-title {
+        font-size: 1.5rem;
+    }
+    
+    .game-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .game-buttons {
+        justify-content: center;
+    }
+    
+    .controls-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #game-canvas {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+    }
+}

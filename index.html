@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hungry Snake - Classic Retro Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <h1 class="game-title">🐍 HUNGRY SNAKE</h1>
+            <div class="game-stats">
+                <div class="score-container">
+                    <span class="label">Score:</span>
+                    <span id="current-score">0</span>
+                </div>
+                <div class="high-score-container">
+                    <span class="label">High Score:</span>
+                    <span id="high-score">0</span>
+                </div>
+                <div class="level-container">
+                    <span class="label">Level:</span>
+                    <span id="current-level">1</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="game-controls">
+            <div class="theme-selector">
+                <label for="theme-select">Theme:</label>
+                <select id="theme-select">
+                    <option value="modern">Modern</option>
+                    <option value="nokia">Old Phone (Nokia)</option>
+                    <option value="crt">CRT Monitor</option>
+                </select>
+            </div>
+            
+            <div class="difficulty-selector">
+                <label for="difficulty-select">Difficulty:</label>
+                <select id="difficulty-select">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="insane">Insane</option>
+                </select>
+            </div>
+
+            <div class="game-buttons">
+                <button id="start-btn" class="game-btn">Start Game</button>
+                <button id="pause-btn" class="game-btn" disabled>Pause</button>
+                <button id="restart-btn" class="game-btn">Restart</button>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <canvas id="game-canvas" width="400" height="400"></canvas>
+            <div id="game-over-screen" class="game-over hidden">
+                <h2>Game Over!</h2>
+                <p>Final Score: <span id="final-score">0</span></p>
+                <p id="new-high-score" class="hidden">🎉 New High Score! 🎉</p>
+                <button id="play-again-btn" class="game-btn">Play Again</button>
+            </div>
+            <div id="pause-screen" class="pause-screen hidden">
+                <h2>Game Paused</h2>
+                <p>Press Space or click Resume to continue</p>
+                <button id="resume-btn" class="game-btn">Resume</button>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <div class="controls-grid">
+                <div class="control-item">
+                    <span class="key">↑ ↓ ← →</span>
+                    <span class="description">Move Snake</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">WASD</span>
+                    <span class="description">Alternative Movement</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">Space</span>
+                    <span class="description">Pause/Resume</span>
+                </div>
+                <div class="control-item">
+                    <span class="key">R</span>
+                    <span class="description">Restart Game</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="game-footer">
+            <p>Made with ❤️ for the hackathon | Use VS Code + GitHub Copilot</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
