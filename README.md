@@ -5,7 +5,7 @@ A nostalgic recreation of the classic Snake game with modern web technologies.
 ## Features
 
 - **Classic Snake Gameplay**: Navigate the snake to eat food and grow longer
-- **Custom Themes**: 
+- **Custom Themes**:
   - Old Phone (Nokia-style)
   - CRT Monitor (retro green)
   - Modern (sleek design)
